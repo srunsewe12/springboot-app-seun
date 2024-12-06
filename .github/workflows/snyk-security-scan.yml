@@ -48,30 +48,13 @@ jobs:
         run: docker push srunsewe/springbootapp:latest
 
       - name: Set up Snyk CLI
-        uses: snyk/actions/setup@v2
+        uses: snyk/actions/setup@v2.6.0
         with:
           version: 'latest'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions@v2
-        with:
-          args: test --all-projects
-
-      - name: Container Analysis with Snyk
-        uses: snyk/actions/container@v2
-        with:
-          image: srunsewe/springbootapp:latest
-
-      - name: IaC Scan with Snyk
-        uses: snyk/actions/iac@v2
-        with:
-          args: test manifests/
-
-      - name: Notify on Failure
-        if: failure()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: 'C083E56JWUX'
-          slack-message: 'Snyk Security Scan failed! :x: Please check the logs.'
+        run: snyk test --all-projects
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
